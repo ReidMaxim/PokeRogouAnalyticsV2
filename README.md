@@ -109,34 +109,70 @@ src/
   content/game-access/   Battle scene reader
   content/overlay/       In-game HUD (draggable)
   content/collectors/    Change-detection polling
-  background/            Service worker + IndexedDB owner
-  popup/                 Extension popup UI
-  recap/                 Full run recap page + compare + heatmap + PNG
-  analytics/             Recap builder, dashboard, cross-run stats, recommendations
-  storage/               IndexedDB + settings
-  shared/                Biome names, sprites, vouchers, validation, messaging
-  pokedex/               PokeAPI client, type effectiveness, battle cards overlay
-  dex/                   Browseable Pokédex extension page
-```
+  # PokéRogue Analytics
 
-## Credits
+  Chrome extension (Manifest V3) that collects PokéRogue gameplay data locally and provides run recaps, dashboards, exports, and a small in-game overlay.
 
-- [RogueDex](https://github.com/roguedex-dev/roguedex) (MIT) — inspiration for in-battle type matchup cards, species ID conversion table, and dual-type effectiveness rules.
-- [PokeAPI](https://pokeapi.co/) — species types, abilities, flavor text, and sprites.
+  Quick start
+  -----------
 
-## Development
+  1. Install dependencies:
 
-```bash
-npm run watch
-npm run typecheck
-```
+  ```bash
+  npm install
+  ```
 
-After rebuild: reload extension on `chrome://extensions`, then reload PokéRogue.
+  2. Generate icons and build:
 
-## UI preferences (v3.0+)
+  ```bash
+  node scripts/generate-icons.mjs
+  npm run build
+  ```
 
-Run history **sort**, **outcome**, **starter**, **biome**, **minimum wave**, and **pinned-only** filters are saved in `chrome.storage.local` and restored when you reopen the popup. The recap timeline filter uses the same storage, so your last chip selection survives browser restarts.
+  3. Load unpacked extension (in Chrome):
 
-## Project status
+  - Open `chrome://extensions` → Developer mode
+  - Click `Load unpacked` and select the project's `dist/` folder
+  - After loading, reload the PokéRogue tab so the extension can hook the game
 
-**v3.1.0** adds the Pokédex layer (battle type cards + browseable dex). **v3.0.0** completed the core analytics roadmap: local run collection, recap timeline, cross-run dashboard, compare tools, exports/imports, and overlay HUD.
+  If you want to develop with live rebuilds:
+
+  ```bash
+  npm run watch
+  ```
+
+  Recommended workflow for contributors
+  -------------------------------------
+
+  - Clone the repo
+  - `npm install`
+  - `npm run build` (or `npm run watch` during development)
+  - Load `dist/` in Chrome (Developer mode → Load unpacked)
+
+  Features
+  --------
+
+  - Automatic per-run logging to `IndexedDB`
+  - Run recap page with interactive timeline, party details, and shareable PNG
+  - Popup dashboard, run history, exports (CSV/JSON), and import/backup
+  - Optional in-game overlay showing wave/money/score and logging state
+
+  Server & leaderboard
+  --------------------
+
+  This repository includes an example Cloud Function and documentation for a simple leaderboard ingestion endpoint (`docs/firebase-cloud-function.md`). If you enable the leaderboard in the popup, enter the upload URL or your Cloud Function URL.
+
+  Contributing
+  ------------
+
+  See `CONTRIBUTING.md` for a short contributor guide.
+
+  License
+  -------
+
+  This repository is provided under the MIT license — see `LICENSE`.
+
+  More details
+  ------------
+  See the `src/` folder for the implementation and `docs/` for auxiliary guides.
+
