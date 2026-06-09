@@ -160,7 +160,63 @@ src/
   Server & leaderboard
   --------------------
 
-  This repository includes an example Cloud Function and documentation for a simple leaderboard ingestion endpoint (`docs/firebase-cloud-function.md`). If you enable the leaderboard in the popup, enter the upload URL or your Cloud Function URL.
+  This repository includes an example Cloud Function and documentation for a simple leaderboard ingestion endpoint (`docs/firebase-cloud-function.md`). The extension can upload run summaries to a remote leaderboard — below are quick setup steps for Firebase Realtime Database (RTDB) or using the included Cloud Function for secure ingestion.
+
+  Leaderboard (quick setup)
+  -------------------------
+
+  1) Firebase RTDB (simple, quick)
+
+  - Create a Firebase project at https://console.firebase.google.com/ and enable Realtime Database.
+  - Use the Database → Rules editor to allow reads from the popup. For testing you can allow public reads/writes (not recommended long-term):
+
+  ```json
+  {
+    "rules": {
+      ".read": true,
+      ".write": true
+    }
+  }
+  ```
+
+  - The popup expects a GET-able JSON endpoint. Use the RTDB URL with `/leaderboard.json`, e.g.
+
+  ```
+  https://<your-project>.firebaseio.com/leaderboard.json
+  ```
+
+  - Set that URL in the popup `Leaderboard URL` field. The popup appends `/leaderboard.json` if you give the base DB URL.
+
+  2) Secure ingestion (recommended)
+
+  - Use the included Cloud Function example (`docs/firebase-cloud-function.md`) which validates a shared secret and writes to your RTDB. Deploy the function and use its HTTPS URL in the popup as the upload target; the viewer will GET the RTDB endpoint to list scores.
+  - When using the Cloud Function you should set a secret in the popup `Leaderboard secret` field. The extension will send this header on uploads: `X-Leaderboard-Secret: <secret>`.
+
+  3) Testing with curl
+
+  - Test upload (POST to your function or RTDB REST write URL):
+
+  ```bash
+  curl -X POST 'https://<your-upload-endpoint>' \
+    -H 'Content-Type: application/json' \
+    -H 'X-Leaderboard-Secret: <your-secret>' \
+    -d '{"username":"you","maxWave":51,"timestamp":"2026-06-09T12:34:00Z"}'
+  ```
+
+  - Check entries (RTDB REST GET):
+
+  ```bash
+  curl 'https://<your-project>.firebaseio.com/leaderboard.json'
+  ```
+
+  Notes & troubleshooting
+  -----------------------
+
+  - The popup viewer performs a browser GET to the RTDB `/leaderboard.json` path — confirm entries exist there. If the viewer shows no entries, open the popup DevTools (right-click the popup → Inspect) and check Network/Console for CORS or auth errors.
+  - For public-read RTDB the viewer can fetch directly; for secure ingestion prefer the Cloud Function which writes to the DB on the server and avoids exposing write access to clients.
+  - See `docs/firebase-cloud-function.md` for an example Cloud Function and deployment notes.
+
+  Set the `Leaderboard URL` and (optionally) `Leaderboard secret` in the popup preferences to enable uploads from your extension.
 
   Contributing
   ------------
