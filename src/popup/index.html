@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PokéRogue Analytics</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="header">
+      <h1>PokéRogue Analytics</h1>
+      <p class="subtitle">Local gameplay analytics collector</p>
+    </header>
+
+    <section class="card">
+      <h2>Discovery & Collection</h2>
+      <label class="toggle-row">
+        <span>Game State Discovery Mode</span>
+        <input id="discovery-toggle" type="checkbox" />
+      </label>
+      <label class="toggle-row">
+        <span>Collect Run Data</span>
+        <input id="collection-toggle" type="checkbox" />
+      </label>
+      <label class="toggle-row">
+        <span>In-Game Overlay</span>
+        <input id="overlay-toggle" type="checkbox" />
+      </label>
+      <label class="toggle-row">
+        <span>Debug Logging</span>
+        <input id="debug-toggle" type="checkbox" />
+      </label>
+      <div class="button-row">
+        <button id="run-discovery-btn" type="button">Run Discovery Scan</button>
+        <button id="ping-btn" type="button" class="secondary">Ping Tab</button>
+        <button id="reset-overlay-btn" type="button" class="secondary">Reset Overlay Position</button>
+      </div>
+      <p id="status-text" class="status">Loading settings…</p>
+    </section>
+
+    <section class="card">
+      <h2>Leaderboard</h2>
+      <label class="toggle-row">
+        <span>Enable Leaderboard (opt-in)</span>
+        <input id="leaderboard-toggle" type="checkbox" />
+      </label>
+      <label class="field-row">
+        <span>Username</span>
+        <input id="leaderboard-username" type="text" placeholder="Display name" />
+      </label>
+      <label class="field-row">
+        <span>Leaderboard URL</span>
+        <input id="leaderboard-url" type="url" placeholder="https://<project>.firebaseio.com/leaderboard.json" />
+      </label>
+      <label class="field-row">
+        <span>Upload Secret (optional)</span>
+        <input id="leaderboard-secret" type="text" placeholder="Optional upload secret (for secure endpoints)" />
+      </label>
+      <div class="button-row">
+        <button id="leaderboard-test-btn" type="button" class="secondary">Test Upload</button>
+      </div>
+      <p class="hint">Enter a POST endpoint that accepts JSON. For instructions, see the Firebase setup in the popup help.</p>
+      <div class="leaderboard-view">
+        <div class="button-row">
+          <button id="leaderboard-refresh-btn" type="button" class="secondary">Refresh Leaderboard</button>
+          <input id="leaderboard-filter" type="search" placeholder="Filter username…" />
+          <select id="leaderboard-page-size">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50" selected>50</option>
+          </select>
+          <button id="leaderboard-prev-btn" type="button" class="secondary">◀ Prev</button>
+          <button id="leaderboard-next-btn" type="button" class="secondary">Next ▶</button>
+        </div>
+        <div id="leaderboard-list" class="leaderboard-list">
+          <p class="empty-hint">No leaderboard loaded. Click Refresh.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Pokédex &amp; Battle Cards</h2>
+      <label class="toggle-row">
+        <span>In-Battle Type Cards</span>
+        <input id="battle-cards-toggle" type="checkbox" />
+      </label>
+      <p class="hint">Shows ally/enemy weaknesses, resistances, and immunities during battle decisions (RogueDex-style).</p>
+      <div class="button-row">
+        <button id="open-dex-btn" type="button">Open Pokédex</button>
+      </div>
+      <p id="pokedex-progress-text" class="status">Pokédex: loading…</p>
+    </section>
+
+    <section class="card playcard-section">
+      <div class="playcard-head">
+        <h2>Run Recap</h2>
+        <select id="recap-run-picker" aria-label="Select run"></select>
+      </div>
+      <div id="playcard" class="playcard">
+        <p class="empty-hint">Loading recap…</p>
+      </div>
+      <div class="button-row">
+        <button id="open-recap-btn" type="button">Open Recap</button>
+        <button id="copy-recap-link-btn" type="button" class="secondary">Copy Recap Link</button>
+        <button id="copy-summary-btn" type="button" class="secondary">Copy Summary</button>
+      </div>
+      <label class="run-note-field">
+        <span>Run note</span>
+        <textarea id="run-note" rows="2" placeholder="Add a note about this run…"></textarea>
+      </label>
+    </section>
+
+    <section class="card">
+      <div class="history-head">
+        <h2>Run History</h2>
+        <label class="history-pin-filter">
+          <input id="history-pinned-only" type="checkbox" />
+          <span>Pinned only</span>
+        </label>
+        <select id="history-sort" aria-label="Sort runs">
+          <option value="newest">Newest first</option>
+          <option value="oldest">Oldest first</option>
+          <option value="highest-wave">Highest wave</option>
+          <option value="lowest-wave">Lowest wave</option>
+          <option value="wins-first">Wins first</option>
+          <option value="longest-first">Longest first</option>
+          <option value="shortest-first">Shortest first</option>
+        </select>
+        <select id="history-outcome" aria-label="Filter by outcome">
+          <option value="all">All outcomes</option>
+          <option value="active">Active</option>
+          <option value="win">Wins</option>
+          <option value="loss">Losses</option>
+        </select>
+        <select id="history-starter" aria-label="Filter by starter">
+          <option value="all">All starters</option>
+        </select>
+        <select id="history-biome" aria-label="Filter by biome">
+          <option value="all">All biomes</option>
+        </select>
+        <input
+          id="history-min-wave"
+          type="number"
+          min="0"
+          step="1"
+          placeholder="Min wave"
+          aria-label="Minimum wave filter"
+        />
+        <input id="history-filter" type="search" placeholder="Filter runs…" aria-label="Filter runs" />
+        <button id="clear-history-filters-btn" type="button" class="secondary">Clear Filters</button>
+      </div>
+      <div id="run-history-list" class="run-history-list">
+        <p class="empty-hint">Loading runs…</p>
+      </div>
+      <div class="button-row history-bulk-row">
+        <button id="pin-filtered-btn" type="button" class="secondary">Pin Visible</button>
+        <button id="unpin-filtered-btn" type="button" class="secondary">Unpin Visible</button>
+        <button id="delete-visible-btn" type="button" class="danger">Delete Visible</button>
+        <button id="export-visible-json-btn" type="button" class="secondary">Export Visible (JSON)</button>
+        <button id="export-visible-csv-btn" type="button" class="secondary">Export Visible (CSV)</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Dashboard</h2>
+      <div class="stats-grid">
+        <div class="stat">
+          <span class="stat-label">Pokédex Seen</span>
+          <span id="stat-pokedex-seen" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Total Runs</span>
+          <span id="stat-total-runs" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Average Wave</span>
+          <span id="stat-avg-wave" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Avg Wave (Wins)</span>
+          <span id="stat-win-avg-wave" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Avg Wave (Losses)</span>
+          <span id="stat-loss-avg-wave" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Win vs Loss Δ</span>
+          <span id="stat-win-loss-delta" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Best Run</span>
+          <span id="stat-best-run" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Most Used Pokémon</span>
+          <span id="stat-top-pokemon" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Best Starter</span>
+          <span id="stat-best-starter" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Top Starter Avg Wave</span>
+          <span id="stat-top-starter-wave" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Win Rate</span>
+          <span id="stat-win-rate" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Pinned Runs</span>
+          <span id="stat-pinned-runs" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Average Duration</span>
+          <span id="stat-avg-duration" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Longest Run</span>
+          <span id="stat-longest-run" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Shortest Run</span>
+          <span id="stat-shortest-run" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Win Streak</span>
+          <span id="stat-win-streak" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">W/L Record</span>
+          <span id="stat-record" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Loss Streak</span>
+          <span id="stat-loss-streak" class="stat-value">—</span>
+        </div>
+        <div class="stat">
+          <span class="stat-label">Toughest Biome</span>
+          <span id="stat-tough-biome" class="stat-value">—</span>
+        </div>
+      </div>
+      <div id="insights-panel" class="insights-panel hidden">
+        <h3>Starter Picker</h3>
+        <p class="hint starter-picker-hint">Click a starter to filter run history.</p>
+        <div id="starter-picker" class="starter-picker"></div>
+        <h3>Starter Performance</h3>
+        <ul id="starter-insights" class="insights-list"></ul>
+        <h3>Biome Outcomes</h3>
+        <ul id="biome-insights" class="insights-list"></ul>
+      </div>
+      <p class="hint overlay-hint">Drag the in-game overlay by its header to reposition. Position is saved automatically.</p>
+      <p class="hint">Logs are saved when wave or run state changes. Reload PokéRogue after updating the extension.</p>
+    </section>
+
+    <section class="card">
+      <h2>Export</h2>
+      <label class="toggle-row">
+        <span>Auto-export finished runs</span>
+        <input id="auto-export-toggle" type="checkbox" />
+      </label>
+      <label class="toggle-row export-format-row">
+        <span>Auto-export format</span>
+        <select id="auto-export-format" aria-label="Auto-export format">
+          <option value="csv">CSV</option>
+          <option value="json">JSON</option>
+          <option value="both">Both</option>
+        </select>
+      </label>
+      <div class="button-row">
+        <button id="export-json-btn" type="button" class="secondary">Export All JSON</button>
+        <button id="export-csv-btn" type="button" class="secondary">Export All CSV</button>
+      </div>
+      <div class="button-row">
+        <button id="export-run-json-btn" type="button" class="secondary">Export This Run (JSON)</button>
+        <button id="export-run-csv-btn" type="button" class="secondary">Export This Run (CSV)</button>
+      </div>
+      <div class="button-row">
+        <button id="export-pinned-json-btn" type="button" class="secondary">Export Pinned (JSON)</button>
+        <button id="export-pinned-csv-btn" type="button" class="secondary">Export Pinned (CSV)</button>
+      </div>
+      <div class="button-row">
+        <button id="export-active-json-btn" type="button" class="secondary">Export Active (JSON)</button>
+        <button id="export-active-csv-btn" type="button" class="secondary">Export Active (CSV)</button>
+      </div>
+      <div class="button-row">
+        <button id="clear-data-btn" type="button" class="danger">Clear All Data</button>
+        <button id="delete-unpinned-btn" type="button" class="danger">Delete Unpinned Runs</button>
+      </div>
+    </section>
+
+    <footer class="footer">
+      Open DevTools on a PokéRogue tab and use
+      <code>__POKEROGUE_ANALYTICS__.getState()</code>
+    </footer>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

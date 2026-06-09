@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pokédex — PokéRogue Analytics</title>
+    <link rel="stylesheet" href="dex.css" />
+  </head>
+  <body>
+    <header class="dex-header">
+      <div>
+        <p class="eyebrow">PokéRogue Analytics</p>
+        <h1>Pokédex</h1>
+      </div>
+      <div class="dex-progress">
+        <span id="seen-count">Seen — / —</span>
+        <span id="caught-count">Caught — / —</span>
+      </div>
+    </header>
+
+    <section class="dex-controls">
+      <input id="dex-search" type="search" placeholder="Search by name or #" aria-label="Search species" />
+      <select id="dex-filter" aria-label="Filter species">
+        <option value="all">All</option>
+        <option value="seen">Seen</option>
+        <option value="caught">Caught</option>
+        <option value="unseen">Unseen</option>
+      </select>
+      <select id="dex-type-filter" aria-label="Filter by type">
+        <option value="all">All types</option>
+      </select>
+      <button id="dex-refresh-btn" type="button" class="secondary">Refresh</button>
+    </section>
+
+    <main class="dex-main">
+      <div id="dex-grid" class="dex-grid">
+        <p class="empty-hint">Loading Pokédex…</p>
+      </div>
+      <aside id="dex-detail" class="dex-detail hidden">
+        <button id="dex-detail-close" type="button" class="secondary">Close</button>
+        <div id="dex-detail-content"></div>
+      </aside>
+    </main>
+
+    <script src="dex.js"></script>
+  </body>
+</html>

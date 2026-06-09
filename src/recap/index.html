@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Run Recap — PokéRogue Analytics</title>
+    <link rel="stylesheet" href="recap.css" />
+  </head>
+  <body>
+    <header class="recap-header">
+      <div class="recap-header-top">
+        <div>
+          <p class="eyebrow">PokéRogue Analytics</p>
+          <h1 id="recap-headline">Run Recap</h1>
+        </div>
+        <div class="header-actions">
+          <select id="run-picker" aria-label="Select run"></select>
+          <button id="share-png-btn" type="button" class="secondary">Share PNG</button>
+          <button id="copy-recap-link-btn" type="button" class="secondary">Copy Link</button>
+          <button id="copy-summary-btn" type="button" class="secondary">Copy Summary</button>
+          <button id="refresh-btn" type="button" class="secondary">Refresh</button>
+        </div>
+      </div>
+      <div class="recap-badges">
+        <span id="status-badge" class="badge">—</span>
+        <span id="result-badge" class="badge hidden">—</span>
+      </div>
+      <p id="recap-subtitle" class="subtitle">Loading…</p>
+      <p id="recap-narrative" class="narrative"></p>
+      <p id="recap-death-summary" class="death-summary hidden"></p>
+      <p id="recap-note-display" class="run-note-display hidden"></p>
+    </header>
+
+    <main class="recap-main">
+      <section class="stat-row" id="stat-row"></section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Run Timeline</h2>
+          <div class="filter-chips" id="filter-chips">
+            <button type="button" class="chip active" data-filter="all">All</button>
+            <button type="button" class="chip" data-filter="wave">Waves</button>
+            <button type="button" class="chip" data-filter="trainer">Trainers</button>
+            <button type="button" class="chip" data-filter="party">Party</button>
+            <button type="button" class="chip" data-filter="money">Money</button>
+            <button type="button" class="chip" data-filter="biome">Biome</button>
+            <button type="button" class="chip" data-filter="enemy">Enemy</button>
+            <button type="button" class="chip" data-filter="modifier">Modifiers</button>
+            <button type="button" class="chip" data-filter="voucher">Vouchers</button>
+            <button type="button" class="chip" data-filter="evolution">Evolution</button>
+            <button id="reset-timeline-filter-btn" type="button" class="chip chip-reset">Reset</button>
+          </div>
+        </div>
+        <div id="timeline-container" class="timeline-scroll"></div>
+        <div id="detail-panel" class="detail-panel"></div>
+      </section>
+
+      <section class="panel charts-row">
+        <div id="money-chart" class="chart-box"></div>
+        <div id="score-chart" class="chart-box"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Party</h2>
+        <div id="party-compare"></div>
+      </section>
+
+      <section class="panel" id="modifiers-panel">
+        <h2>Run Modifiers</h2>
+        <div id="modifiers-list" class="modifiers-list-wrap"></div>
+      </section>
+
+      <section class="panel" id="trainer-log-panel">
+        <h2>Trainer Battles</h2>
+        <div id="trainer-log-wrap" class="trainer-log-wrap"></div>
+      </section>
+
+      <section class="panel" id="biome-journey-panel">
+        <h2>Biome Journey</h2>
+        <div id="biome-journey-wrap" class="journey-wrap"></div>
+      </section>
+
+      <section class="panel" id="modifier-log-panel">
+        <h2>Modifier History</h2>
+        <div id="modifier-log-wrap" class="journey-wrap"></div>
+      </section>
+
+      <section class="panel" id="voucher-log-panel">
+        <h2>Voucher History</h2>
+        <div id="voucher-log-wrap" class="journey-wrap"></div>
+      </section>
+
+      <section class="panel" id="money-log-panel">
+        <h2>Money History</h2>
+        <div id="money-log-wrap" class="journey-wrap"></div>
+      </section>
+
+      <section class="panel" id="enemy-log-panel">
+        <h2>Enemy Encounters</h2>
+        <div id="enemy-log-wrap" class="journey-wrap"></div>
+      </section>
+
+      <section class="panel" id="compare-panel">
+        <div class="panel-head">
+          <h2>Compare Runs</h2>
+          <div class="compare-pickers">
+            <label>
+              Run A
+              <select id="compare-run-a" aria-label="Compare run A"></select>
+            </label>
+            <label>
+              Run B
+              <select id="compare-run-b" aria-label="Compare run B"></select>
+            </label>
+          </div>
+          <div class="compare-actions">
+            <button id="compare-png-btn" type="button" class="secondary">Share Compare PNG</button>
+            <button id="compare-previous-btn" type="button" class="secondary">Compare Previous</button>
+            <button id="compare-best-btn" type="button" class="secondary">Compare Best</button>
+            <button id="compare-worst-btn" type="button" class="secondary">Compare Worst</button>
+            <button id="compare-pinned-btn" type="button" class="secondary">Compare Pinned</button>
+            <button id="compare-same-starter-btn" type="button" class="secondary">Compare Same Starter</button>
+          </div>
+        </div>
+        <div id="compare-table-wrap" class="compare-table-wrap">
+          <p class="empty-hint">Select two runs to compare.</p>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Key Moments</h2>
+        <ul id="moments-list" class="moments-list"></ul>
+      </section>
+
+      <section class="panel" id="cross-run-panel">
+        <h2>Cross-Run Insights</h2>
+        <div class="trend-section">
+          <h3>Win Rate Over Time</h3>
+          <div id="win-rate-chart" class="win-rate-chart"></div>
+        </div>
+        <div id="biome-heatmap" class="biome-heatmap"></div>
+        <div class="insights-grid">
+          <div>
+            <h3>Starter Win Rates</h3>
+            <ul id="cross-starter-list" class="insights-list"></ul>
+          </div>
+          <div>
+            <h3>Biome Losses</h3>
+            <ul id="cross-biome-list" class="insights-list"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel collapsible">
+        <button id="events-toggle" type="button" class="collapse-toggle">Event log ▾</button>
+        <div id="events-table-wrap" class="events-table-wrap hidden">
+          <div class="event-log-controls">
+            <input id="event-log-search" type="search" placeholder="Search events…" aria-label="Search events" />
+            <select id="event-log-type" aria-label="Filter event type">
+              <option value="all">All types</option>
+              <option value="wave_change">Wave</option>
+              <option value="trainer_battle">Trainer</option>
+              <option value="party_change">Party</option>
+              <option value="enemy_change">Enemy</option>
+              <option value="money_change">Money</option>
+              <option value="biome_change">Biome</option>
+              <option value="modifier_change">Modifier</option>
+              <option value="voucher_change">Voucher</option>
+              <option value="run_end">Run end</option>
+            </select>
+          </div>
+          <table class="events-table">
+            <thead>
+              <tr>
+                <th>Wave</th>
+                <th>Type</th>
+                <th>Label</th>
+                <th>Money</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="events-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script src="recap.js"></script>
+  </body>
+</html>

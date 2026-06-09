@@ -1,0 +1,56 @@
+{
+  "manifest_version": 3,
+  "name": "PokéRogue Analytics",
+  "version": "3.0.0",
+  "description": "Automatically collect gameplay data from PokéRogue while you play and save it locally.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    },
+    "default_title": "PokéRogue Analytics"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": ["storage", "downloads"],
+  "host_permissions": [
+    "*://pokerogue.net/*",
+    "*://*.pokerogue.net/*",
+    "*://pagefaultgames.github.io/pokerogue/*",
+    "https://pokeapi.co/*",
+    "https://*.firebaseio.com/*",
+    "https://firestore.googleapis.com/*",
+    "https://*.cloudfunctions.net/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; connect-src 'self' https://pokeapi.co https://*.firebaseio.com https://firestore.googleapis.com; img-src 'self' https://raw.githubusercontent.com/PokeAPI/sprites/;"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://pokerogue.net/*",
+        "*://*.pokerogue.net/*",
+        "*://pagefaultgames.github.io/pokerogue/*"
+      ],
+      "js": ["page-hook.js"],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://pokerogue.net/*",
+        "*://*.pokerogue.net/*",
+        "*://pagefaultgames.github.io/pokerogue/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
